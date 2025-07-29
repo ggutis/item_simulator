@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Accounts {
+  accountId  Int         @id @default(autoincrement()) @map("accountId")
+  userId     String      @unique @map("userId")
+  password   String      @map("password")
+  createdAt  DateTime    @default(now())  @map("createdAt")
+  updatedAt  DateTime    @updatedAt @map("updatedAt")
+  
+  characters Character[]
+
+  @@map("Accounts")
+}
+
+
+
+model Character {
+  characterId    Int        @id @default(autoincrement()) @map("characterId")
+  charactername  String     @unique @map("charactername")
+  accountId      Int        @map("accountId")
+  health         Int        @default(500)
+  power          Int        @default(100)
+  money          Int        @default(10000)
+  createdAt      DateTime            @default(now())    @map("createdAt")
+  updatedAt      DateTime            @updatedAt   @map("updatedAt")
+  
+  account        Accounts             @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+  inventoryItems Inventory[]
+  equippedItems  CharacterItems[]
+  
+  @@map("Character")
+}
+
+model Items {
+  itemId             Int                 @id @default(autoincrement()) @map("itemId")
+  itemname           String     @map("itemame")
+  description    String?        @map("description")
+  rarity         String         @map("rarity")
+  createdAt      DateTime        @default(now())  @map("createdAt")
+  updatedAt      DateTime        @updatedAt   @map("updatedAt")
+  
+  inventoryItems Inventory[]
+  equippedItems  CharacterItems[]
+
+  @@map("Items")
+}
+
+model Inventory {
+  invenId     Int       @id @default(autoincrement()) @map("invenId")
+  characterId Int       @map("characterId")
+  itemId      Int       @map("itemId")
+  acquiredAt  DateTime  @default(now()) @map("acquiredAt")
+  
+  character   Character @relation(fields: [characterId], references: [characterId], onDelete: Cascade)
+  items        Items      @relation(fields: [itemId], references: [itemId] )
+
+  @@unique([characterId, itemId]) // 동일 아이템 중복 방지
+
+  @@map("Inventory")
+}
+
+model CharacterItems {
+  characterItemId          Int       @id @default(autoincrement()) @map("characterItemId")
+  characterId Int   @map("characterId")
+  itemId      Int   @map("itemId")
+  equippedAt  DateTime  @default(now()) @map("equippedAt")
+ 
+  character   Character @relation(fields: [characterId], references: [characterId], onDelete: Cascade)
+  items        Items      @relation(fields: [itemId], references: [itemId] )
+  
+
+  @@unique([characterId, itemId]) // 하나의 캐릭터는 같은 아이템을 여러 번 장착 불가
+
+  @@map("CharacterItems")
+}
