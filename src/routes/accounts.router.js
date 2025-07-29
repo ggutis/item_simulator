@@ -83,9 +83,10 @@ router.post("/sign-in", async (req, res, next) => {
 router.get("/account", authMiddleware, async (req, res, next) => {
   const { userId } = req.user;
 
-  const account = await prisma.accounts.findFirst({
+  const account = await prisma.accounts.findUnique({
     where: { userId: userId },
     select: {
+      accountId:true,
       userId: true,
       createdAt: true,
       updatedAt: true,

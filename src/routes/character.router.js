@@ -40,15 +40,15 @@ router.post("/characters", authMiddleware, async (req, res) => {
       data: {
         charactername,
         accountId,
-    },
-        select: {
-          characterId: true,
-          charactername: true,
-          health: true,
-          power: true,
-          money: true,
-          createdAt: true,
-        },
+      },
+      select: {
+        characterId: true,
+        charactername: true,
+        health: true,
+        power: true,
+        money: true,
+        createdAt: true,
+      },
     });
 
     return res
@@ -57,6 +57,40 @@ router.post("/characters", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "캐릭터 생성 중 오류 발생" });
+  }
+});
+
+// 캐릭터 삭제 api
+router.delete("/character/:charactername", authMiddleware, async (req, res) => {
+  try {
+    const { charactername } = req.params;
+    const { accountId } = req.user;
+
+    // 해당 유저의 캐릭터 중에서 이름이 일치하는 캐릭터 찾기
+    const character = await prisma.character.findFirst({
+      where: { charactername,accountId },});
+
+    if (!character) {
+      return res
+        .status(404)
+        .json({ message: "해당 캐릭터가 존재하지 않거나 권한이 없습니다." });
+    }
+
+    // 캐릭터 삭제
+    await prisma.character.delete({
+      where: {
+        characterId: character.characterId,
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ message: "캐릭터가 성공적으로 삭제되었습니다." });
+  } catch (error) {
+    console.error("캐릭터 삭제 에러:", error);
+    return res
+      .status(500)
+      .json({ message: "캐릭터 삭제 중 서버 오류가 발생했습니다." });
   }
 });
 
