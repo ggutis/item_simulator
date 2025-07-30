@@ -79,8 +79,9 @@ router.post("/sign-in", async (req, res, next) => {
   }
 });
 
-/** 사용자 조회 API **/
-router.get("/account", authMiddleware, async (req, res, next) => {
+/** 계정 조회(관리자용) API **/
+
+router.get("/account/", authMiddleware, async (req, res, next) => {
   const { userId } = req.user;
 
   const account = await prisma.accounts.findUnique({

@@ -46,13 +46,17 @@ model Character {
 }
 
 model Items {
-  itemId             Int                 @id @default(autoincrement()) @map("itemId")
-  itemname           String     @map("itemame")
-  description    String?        @map("description")
-  rarity         String         @map("rarity")
-  createdAt      DateTime        @default(now())  @map("createdAt")
-  updatedAt      DateTime        @updatedAt   @map("updatedAt")
-  
+  itemId         Int        @id @default(autoincrement()) @map("itemId")
+  item_code      Int        @unique  @map("item_code")
+  item_name      String     @map("item_name")
+  item_price     Int        @map("item_price")
+  item_stat      Json       @map("item_stat")
+  item_type      String     @map("item_type")
+  description    String?    @map("description")
+  rarity         String     @map("rarity")
+  createdAt      DateTime   @default(now())  @map("createdAt")
+  updatedAt      DateTime   @updatedAt   @map("updatedAt")
+
   inventoryItems Inventory[]
   equippedItems  CharacterItems[]
 

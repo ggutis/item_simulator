@@ -13,12 +13,11 @@ router.post("/characters", authMiddleware, async (req, res) => {
     const isExisCharacter = await prisma.character.findFirst({
       where: { charactername },
     });
-    
-    
+
     if (!charactername) {
       return res.status(400).json({ message: "캐릭터 이름을 입력해주세요." });
     }
-    
+
     if (isExisCharacter) {
       return res
         .status(409)
@@ -36,23 +35,22 @@ router.post("/characters", authMiddleware, async (req, res) => {
       return res.status(400).json({
         message: `캐릭터 생성 한도 초과: 최대 ${MAX_CHARACTERS}개까지 생성 가능합니다.`,
       });
-    } 
-  
+    }
 
     // 3. 캐릭터 생성
     const newCharacter = await prisma.character.create({
       data: {
         charactername,
         accountId,
-    },
-        select: {
-          characterId: true,
-          charactername: true,
-          health: true,
-          power: true,
-          money: true,
-          createdAt: true,
-        },
+      },
+      select: {
+        characterId: true,
+        charactername: true,
+        health: true,
+        power: true,
+        money: true,
+        createdAt: true,
+      },
     });
 
     return res
@@ -64,9 +62,8 @@ router.post("/characters", authMiddleware, async (req, res) => {
   }
 });
 
-
 // 캐릭터 삭제 api
-router.delete('/character/:charactername', authMiddleware, async (req, res) => {
+router.delete("/character/:charactername", authMiddleware, async (req, res) => {
   try {
     const { charactername } = req.params;
     const { accountId } = req.user;
@@ -80,9 +77,10 @@ router.delete('/character/:charactername', authMiddleware, async (req, res) => {
       },
     });
 
-
     if (!character) {
-      return res.status(404).json({ message: '해당 캐릭터가 존재하지 않거나 권한이 없습니다.' });
+      return res
+        .status(404)
+        .json({ message: "해당 캐릭터가 존재하지 않거나 권한이 없습니다." });
     }
 
     // 캐릭터 삭제
@@ -92,16 +90,61 @@ router.delete('/character/:charactername', authMiddleware, async (req, res) => {
       },
     });
 
-    return res.status(200).json({ message: '캐릭터가 성공적으로 삭제되었습니다.' });
+    return res
+      .status(200)
+      .json({ message: "캐릭터가 성공적으로 삭제되었습니다." });
   } catch (error) {
-    console.error('캐릭터 삭제 에러:', error);
-    return res.status(500).json({ message: '캐릭터 삭제 중 서버 오류가 발생했습니다.' });
+    console.error("캐릭터 삭제 에러:", error);
+    return res
+      .status(500)
+      .json({ message: "캐릭터 삭제 중 서버 오류가 발생했습니다." });
   }
 });
 
+// 캐릭터 상세 조회 API
 
+router.get("/character/:characterId", authMiddleware, async (req, res, next) => {
+  try {
+    const { characterId } = req.params;
 
+    // characterId가 숫자가 아니거나 없는 경우, 400 에러를 반환합니다.
+    if (!characterId || isNaN(parseInt(characterId))) {
+      return res.status(400).json({ message: "유효하지 않은 캐릭터 ID입니다. ID는 숫자여야 합니다." });
+    }
 
+    const { accountId } = req.user;
+
+    const character = await prisma.character.findUnique({
+      where: { characterId: +characterId },
+      select: {
+        charactername: true,
+        health: true,
+        power: true,
+        money: true,
+        accountId: true,
+      },
+    });
+
+    if (!character) {
+      return res.status(404).json({ message: "캐릭터를 찾을 수 없습니다." });
+    }
+
+    const isMyCharacter = accountId && character.accountId === accountId;
+
+    const responseData = {
+      charactername: character.charactername,
+      health: character.health,
+      power: character.power,
+      ...(isMyCharacter && { money: character.money }),
+    };
+
+    return res.status(200).json(responseData);
+  } catch (error) {
+    // 이 catch 블록은 이제 예기치 못한 서버 오류만 처리하게 됩니다.
+    console.error("캐릭터 상세 조회 중 예기치 않은 오류:", error);
+    return res.status(500).json({ message: "서버 내부 오류가 발생했습니다." });
+  }
+});
 
 
 export default router;
