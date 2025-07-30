@@ -82,4 +82,38 @@ router.get("/items", async (req, res, next) => {
   }
 });
 
+/** 아이템 상세 조회 API **/
+router.get("/items/:item_code", async(req, res, next) => {
+    try{
+        const {item_code} = req.params;
+
+        if(isNaN(item_code)) {
+            return res.status(400).json({ message: '유효한 아이템 코드가 아닙니다.'})
+        }
+
+        const item = await prisma.items.findUnique({
+            where: {item_code : +item_code},
+            select: {
+                item_code: true,
+                item_name: true,
+                item_price: true,
+                item_stat: true,
+                item_type: true,
+                description: true,
+                rarity: true,
+            }
+        });
+
+        if(!item){
+            return res.status(400).json({ message:'  해당 아이템을 찾을수 없습니다.' });
+        }
+
+        return res.status(200).json(item);  
+    }catch(error){
+        console.log('아이템 상세조회 오류', error);
+        next(error);
+    }
+});
+
+
 export default router;
