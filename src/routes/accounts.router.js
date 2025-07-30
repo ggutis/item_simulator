@@ -10,17 +10,25 @@ router.post("/sign-up", async (req, res, next) => {
   try {
     const { userId, password, confirmPassword } = req.body;
     const userIdRegex = /^[a-z0-9]+$/;
-    const isExisAccount = await prisma.accounts.findFirst({
-      where: {
-        userId,
-      },
-    });
 
     if (!userIdRegex.test(userId)) {
       return res
         .status(400)
         .json({ message: "아이디는 영어 소문자와 숫자만 사용할 수 있습니다." });
     }
+
+    const containsLetter = /[a=z]/.test(userId);
+    const containsNumber = /[0-9]/.test(userId);
+
+    if(!containsLetter || containsNumber){
+      return res.status(400).json({ message : "아이디는 영어 소문자와 숫자를 모두 포함해야 합니다."});
+    }
+
+    const isExisAccount = await prisma.accounts.findFirst({
+      where: {
+        userId,
+      },
+    });
 
     if (password.length < 6) {
       return res

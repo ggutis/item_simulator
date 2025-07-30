@@ -106,13 +106,7 @@ router.delete("/character/:charactername", authMiddleware, async (req, res) => {
 router.get("/character/:characterId", authMiddleware, async (req, res, next) => {
   try {
     const { characterId } = req.params;
-
-    // characterId가 숫자가 아니거나 없는 경우, 400 에러를 반환합니다.
-    if (!characterId || isNaN(parseInt(characterId))) {
-      return res.status(400).json({ message: "유효하지 않은 캐릭터 ID입니다. ID는 숫자여야 합니다." });
-    }
-
-    const { accountId } = req.user;
+    const { accountId } = req.user; 
 
     const character = await prisma.character.findUnique({
       where: { characterId: +characterId },
@@ -129,10 +123,11 @@ router.get("/character/:characterId", authMiddleware, async (req, res, next) => 
       return res.status(404).json({ message: "캐릭터를 찾을 수 없습니다." });
     }
 
+    // 내 캐릭터인지 확인
     const isMyCharacter = accountId && character.accountId === accountId;
 
     const responseData = {
-      charactername: character.charactername,
+      charactername: character.charactername, 
       health: character.health,
       power: character.power,
       ...(isMyCharacter && { money: character.money }),
@@ -140,11 +135,33 @@ router.get("/character/:characterId", authMiddleware, async (req, res, next) => 
 
     return res.status(200).json(responseData);
   } catch (error) {
-    // 이 catch 블록은 이제 예기치 못한 서버 오류만 처리하게 됩니다.
-    console.error("캐릭터 상세 조회 중 예기치 않은 오류:", error);
-    return res.status(500).json({ message: "서버 내부 오류가 발생했습니다." });
+    console.error("캐릭터 상세 조회 오류:", error);
+    return res.status(500).json({ message: "서버 오류가 발생했습니다." });
   }
 });
+
+
+/** 아이템 목록 조회 API **/
+router.get('/items', async (req, res, next) => {
+  try {
+    const items = await prisma.items.findMany({
+      select: {
+        item_code: true,
+        item_name: true,
+        item_price: true,
+      },
+      orderBy: {
+        item_code: 'asc', // 정렬은 필요에 따라 조절
+      },
+    });
+
+    return res.status(200).json({ items });
+  } catch (error) {
+    console.error('아이템 목록 조회 에러:', error);
+    return res.status(500).json({ message: '아이템 목록 조회 중 서버 오류가 발생했습니다.' });
+  }
+});
+
 
 
 export default router;

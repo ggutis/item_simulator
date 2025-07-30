@@ -7,7 +7,7 @@ import ErrorHandlingMiddleware from './middlewares/error-handling.middleware.js'
 import dotenv from 'dotenv';
 import AccountsRouter from './routes/accounts.router.js';
 import CharacterRouter from './routes/character.router.js';
-import ItemRouter from './routes/item.router.js';
+import ItemsRouter from './routes/item.router.js';
 
 
 dotenv.config();
@@ -41,7 +41,7 @@ app.use(
     },
   }),
 );
-app.use('/api', [AccountsRouter, CharacterRouter, ItemRouter]);
+app.use('/api', [AccountsRouter, CharacterRouter, ItemsRouter]);
 app.use(ErrorHandlingMiddleware);
 
 app.listen(PORT, () => {
