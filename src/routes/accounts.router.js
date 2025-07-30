@@ -1,5 +1,6 @@
 import express from "express";
 import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken';
 import { prisma } from "../utils/prisma/index.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 
@@ -10,6 +11,8 @@ router.post("/sign-up", async (req, res, next) => {
   try {
     const { userId, password, confirmPassword } = req.body;
     const userIdRegex = /^[a-z0-9]+$/;
+    const containsLetter = /[a-z]/.test(userId);
+    const containsNumber = /[0-9]/.test(userId);
 
     if (!userIdRegex.test(userId)) {
       return res
@@ -17,10 +20,7 @@ router.post("/sign-up", async (req, res, next) => {
         .json({ message: "아이디는 영어 소문자와 숫자만 사용할 수 있습니다." });
     }
 
-    const containsLetter = /[a=z]/.test(userId);
-    const containsNumber = /[0-9]/.test(userId);
-
-    if(!containsLetter || containsNumber){
+    if(!containsLetter || !containsNumber){
       return res.status(400).json({ message : "아이디는 영어 소문자와 숫자를 모두 포함해야 합니다."});
     }
 
@@ -72,16 +72,27 @@ router.post("/sign-in", async (req, res, next) => {
     const { userId, password } = req.body;
     const user = await prisma.accounts.findFirst({ where: { userId } });
 
-    if (!user)
+    if (!user) {
       return res.status(401).json({ message: "존재하지 않는 계정입니다." });
-    // 입력받은 사용자의 비밀번호와 데이터베이스에 저장된 비밀번호를 비교합니다.
-    else if (!(await bcrypt.compare(password, user.password)))
+    }
+    if (!(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
+    }
 
-    // 로그인에 성공하면, 사용자의 userId를 바탕으로 세션을 생성합니다.
-    req.session.userId = user.userId;
+    // JWT 생성
+    const token = jwt.sign(
+      { accountId: user.accountId }, // JWT에 담을 정보
+      process.env.JWT_SECRET_KEY, // .env 파일의 비밀 키
+      { expiresIn: "12h" } // 유효 시간 (12시간)
+    );
 
-    return res.status(200).json({ message: "로그인 성공" });
+    // 생성된 토큰을 클라이언트에게 전달
+    res.cookie('authorization', `Bearer ${token}`);
+    return res.status(200).json({ 
+      message: "로그인에 성공했습니다.",
+      token: token 
+    });
+
   } catch (err) {
     next(err);
   }

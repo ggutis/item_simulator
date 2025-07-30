@@ -141,27 +141,6 @@ router.get("/character/:characterId", authMiddleware, async (req, res, next) => 
 });
 
 
-/** 아이템 목록 조회 API **/
-router.get('/items', async (req, res, next) => {
-  try {
-    const items = await prisma.items.findMany({
-      select: {
-        item_code: true,
-        item_name: true,
-        item_price: true,
-      },
-      orderBy: {
-        item_code: 'asc', // 정렬은 필요에 따라 조절
-      },
-    });
-
-    return res.status(200).json({ items });
-  } catch (error) {
-    console.error('아이템 목록 조회 에러:', error);
-    return res.status(500).json({ message: '아이템 목록 조회 중 서버 오류가 발생했습니다.' });
-  }
-});
-
 
 
 export default router;
