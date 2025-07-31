@@ -102,13 +102,15 @@ router.get('/items/:item_code', async (req, res, next) => {
     }
 });
 
+
+/**아이템 정보 수정 **/
 router.patch('/items/:item_code', async(req, res, next) =>{
   try{
     const {item_code} = req.params;
     const updateData = req.body;
 
     const item = await prisma.items.findUnique({
-      where:{ item_code: item_code,}
+      where:{ item_code: +item_code,}
     });
 
     await prisma.$transaction(
