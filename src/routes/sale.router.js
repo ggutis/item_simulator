@@ -97,8 +97,8 @@ router.post('/character/:characterId/sales', authMiddleware, async (req, res, ne
 
     return res.status(200).json({
       message: `${item.item_name} ${count}개를 판매하였습니다.`,
-      gain,
-      remainingMoney: updated.money,
+      판매금액: gain,
+      남은금액: updated.money,
     });
 
   } catch (error) {
