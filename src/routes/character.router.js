@@ -1,10 +1,10 @@
-import express from "express";
-import { prisma } from "../utils/prisma/index.js";
-import authMiddleware from "../middlewares/auth.middleware.js";
+import express from 'express';
+import { prisma } from '../utils/prisma/index.js';
+import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-router.post("/characters", authMiddleware, async (req, res) => {
+router.post('/characters', authMiddleware, async (req, res) => {
   try {
     const { charactername } = req.body;
     const { accountId } = req.user; // authMiddleware에서 넣어준 로그인 계정 ID
@@ -15,13 +15,11 @@ router.post("/characters", authMiddleware, async (req, res) => {
     });
 
     if (!charactername) {
-      return res.status(400).json({ message: "캐릭터 이름을 입력해주세요." });
+      return res.status(400).json({ message: '캐릭터 이름을 입력해주세요.' });
     }
 
     if (isExisCharacter) {
-      return res
-        .status(409)
-        .json({ message: "이미 존재하는 캐릭터 이름입니다." });
+      return res.status(409).json({ message: '이미 존재하는 캐릭터 이름입니다.' });
     }
 
     // 2. 현재 계정의 캐릭터 수 조회
@@ -53,17 +51,15 @@ router.post("/characters", authMiddleware, async (req, res) => {
       },
     });
 
-    return res
-      .status(201)
-      .json({ message: "캐릭터 생성 완료", data: newCharacter });
+    return res.status(201).json({ message: '캐릭터 생성 완료', data: newCharacter });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "캐릭터 생성 중 오류 발생" });
+    return res.status(500).json({ message: '캐릭터 생성 중 오류 발생' });
   }
 });
 
 // 캐릭터 삭제 api
-router.delete("/character/:charactername", authMiddleware, async (req, res) => {
+router.delete('/character/:charactername', authMiddleware, async (req, res) => {
   try {
     const { charactername } = req.params;
     const { accountId } = req.user;
@@ -78,9 +74,9 @@ router.delete("/character/:charactername", authMiddleware, async (req, res) => {
     });
 
     if (!character) {
-      return res
-        .status(404)
-        .json({ message: "해당 캐릭터가 존재하지 않거나 권한이 없습니다." });
+      return res.status(404).json({
+        message: '해당 캐릭터가 존재하지 않거나 권한이 없습니다.',
+      });
     }
 
     // 캐릭터 삭제
@@ -90,23 +86,19 @@ router.delete("/character/:charactername", authMiddleware, async (req, res) => {
       },
     });
 
-    return res
-      .status(200)
-      .json({ message: "캐릭터가 성공적으로 삭제되었습니다." });
+    return res.status(200).json({ message: '캐릭터가 성공적으로 삭제되었습니다.' });
   } catch (error) {
-    console.error("캐릭터 삭제 에러:", error);
-    return res
-      .status(500)
-      .json({ message: "캐릭터 삭제 중 서버 오류가 발생했습니다." });
+    console.error('캐릭터 삭제 에러:', error);
+    return res.status(500).json({ message: '캐릭터 삭제 중 서버 오류가 발생했습니다.' });
   }
 });
 
 // 캐릭터 상세 조회 API
 
-router.get("/character/:characterId", authMiddleware, async (req, res, next) => {
+router.get('/character/:characterId', authMiddleware, async (req, res, next) => {
   try {
     const { characterId } = req.params;
-    const { accountId } = req.user; 
+    const { accountId } = req.user;
 
     const character = await prisma.character.findUnique({
       where: { characterId: +characterId },
@@ -120,14 +112,14 @@ router.get("/character/:characterId", authMiddleware, async (req, res, next) => 
     });
 
     if (!character) {
-      return res.status(404).json({ message: "캐릭터를 찾을 수 없습니다." });
+      return res.status(404).json({ message: '캐릭터를 찾을 수 없습니다.' });
     }
 
     // 내 캐릭터인지 확인
     const isMyCharacter = accountId && character.accountId === accountId;
 
     const responseData = {
-      charactername: character.charactername, 
+      charactername: character.charactername,
       health: character.health,
       power: character.power,
       ...(isMyCharacter && { money: character.money }),
@@ -135,12 +127,9 @@ router.get("/character/:characterId", authMiddleware, async (req, res, next) => 
 
     return res.status(200).json(responseData);
   } catch (error) {
-    console.error("캐릭터 상세 조회 오류:", error);
-    return res.status(500).json({ message: "서버 오류가 발생했습니다." });
+    console.error('캐릭터 상세 조회 오류:', error);
+    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
   }
 });
-
-
-
 
 export default router;
