@@ -7,7 +7,8 @@ import AccountsRouter from './routes/accounts.router.js';
 import CharacterRouter from './routes/character.router.js';
 import ItemRouter from './routes/item.router.js';
 import TokenRouter from './routes/refToken.router.js';
-import Trade from './routes/trade.router.js';
+import PurchaseRouter from './routes/purchase.router.js';
+import SaleRouter from './routes/sale.router.js';
 
 dotenv.config();
 
@@ -22,7 +23,15 @@ app.use(express.json());
 app.use(cookieParser());
 
 // 라우터 등록
-app.use('/api', [AccountsRouter, CharacterRouter, ItemRouter, TokenRouter, Trade]);
+app.use('/api', [
+        AccountsRouter, 
+        CharacterRouter, 
+        ItemRouter, 
+        TokenRouter, 
+        PurchaseRouter, 
+        SaleRouter
+      ]
+    );
 
 // 에러 핸들링 미들웨어
 app.use(ErrorHandlingMiddleware);

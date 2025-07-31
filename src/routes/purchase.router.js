@@ -12,7 +12,7 @@ router.post('/character/:characterId/purchase', authMiddleware, async (req, res,
         const { item_code, count = 1 } = req.body;
 
         if (!item_code || count <= 0) {
-            return res.status(400).json({ message: '유효한 아이템 코드와 수량을 입력해주세요.' });
+            return res.status(400).json({ message: '유효한 아이템과 수량을 입력해주세요.' });
         }
 
         const item = await prisma.items.findUnique({
