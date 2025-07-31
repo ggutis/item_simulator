@@ -78,7 +78,9 @@ router.post('/character/:characterId/purchase', authMiddleware, async (req, res,
 
         return res.status(200).json({
             message: `${item.item_name} ${count}개를 구매하였습니다.`,
-            remainingMoney: updatedCharacter.money,
+            구매금액: totalPrice,
+            남은금액: updatedCharacter.money,
+            
         });
 
     } catch (error) {

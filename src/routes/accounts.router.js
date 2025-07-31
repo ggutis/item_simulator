@@ -83,7 +83,7 @@ router.post('/sign-in', async (req, res, next) => {
     const accessToken = jwt.sign(
       { accountId: user.accountId },
       process.env.ACCESS_TOKEN_SECRET_KEY,
-      { expiresIn: '4m' }
+      { expiresIn: '15m' }
     );
 
     // Refresh Token 생성
