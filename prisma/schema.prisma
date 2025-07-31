@@ -15,13 +15,15 @@ datasource db {
 }
 
 model Accounts {
-  accountId  Int         @id @default(autoincrement()) @map("accountId")
-  userId     String      @unique @map("userId")
-  password   String      @map("password")
-  createdAt  DateTime    @default(now())  @map("createdAt")
-  updatedAt  DateTime    @updatedAt @map("updatedAt")
+  accountId    Int         @id @default(autoincrement()) @map("accountId")
+  userId       String      @unique @map("userId")
+  password     String      @map("password")
+ 
+  createdAt    DateTime    @default(now())  @map("createdAt")
+  updatedAt    DateTime    @updatedAt @map("updatedAt")
   
   characters Character[]
+  refreshToken RefreshToken?
 
   @@map("Accounts")
 }
@@ -59,6 +61,7 @@ model Items {
 
   inventoryItems Inventory[]
   equippedItems  CharacterItems[]
+  itemHistories  ItemHistories[]
 
   @@map("Items")
 }
@@ -90,4 +93,25 @@ model CharacterItems {
   @@unique([characterId, itemId]) // 하나의 캐릭터는 같은 아이템을 여러 번 장착 불가
 
   @@map("CharacterItems")
+}
+
+model RefreshToken {
+  refTokenid        Int      @id @default(autoincrement()) @map("refTokenid")
+  accountId Int      @unique @map("accountId")
+  token     String   @map("token") 
+  createdAt DateTime @default(now())    @map("createdAt")
+  
+  account   Accounts @relation(fields: [accountId], references: [accountId])
+}
+
+model ItemHistories {
+  itemHistoryId String @id @default(uuid()) @map("itemHistoryId")
+  item_code Int @map("item_code")
+  changedField  String @map("changedField")
+  oldValue      String? @map("oldValue")
+  newValue      String @map("newValue")
+  changedAt     DateTime  @default(now())   @map("changedAt")
+
+  item  Items   @relation(fields: [item_code], references: [item_code])
+
 }
