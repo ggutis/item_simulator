@@ -1,5 +1,6 @@
 import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
+import {Prisma} from '@prisma/client';
 
 const router = express.Router();
 
@@ -92,15 +93,16 @@ router.get('/items/:item_code', async (req, res, next) => {
         });
 
         if (!item) {
-            return res.status(400).json({ message: '  해당 아이템을 찾을수 없습니다.' });
+            return res.status(400).json({ message: '해당 아이템을 찾을수 없습니다.' });
         }
 
         return res.status(200).json(item);
-    } catch (error) {
-        console.log('아이템 상세조회 오류', error);
+      }catch(error){
         next(error);
-    }
-});
+      }
+})
+    
+    
 
 
 /**아이템 정보 수정 **/
@@ -109,13 +111,24 @@ router.patch('/items/:item_code', async(req, res, next) =>{
     const {item_code} = req.params;
     const updateData = req.body;
 
+    // item_price가 요청에 포함되어 있더라도, 수정되지 않도록 삭제합니다.
+    if (updateData.item_price) {
+      delete updateData.item_price;
+    }
+
     const item = await prisma.items.findUnique({
       where:{ item_code: +item_code,}
     });
 
-    await prisma.$transaction(
+    // 아이템이 존재하지 않을 경우 에러 처리
+    if (!item) {
+      return res.status(404).json({ message: '해당 아이템을 찾을 수 없습니다.' });
+    }
+
+    const updatedItem = await prisma.$transaction(
       async(tx) => {
-        await tx.item.update({
+        // 아이템 정보 업데이트
+        const updated = await tx.items.update({
           data:{
             ...updateData,
           },
@@ -124,6 +137,7 @@ router.patch('/items/:item_code', async(req, res, next) =>{
           },
         });
 
+        // 변경 내역 기록
         for(let key in updateData) {
           if(item[key] !== updateData[key]) {
             await tx.itemHistories.create({
@@ -136,17 +150,23 @@ router.patch('/items/:item_code', async(req, res, next) =>{
             });
           }
         }
+        // 트랜잭션의 결과로 업데이트된 아이템을 반환
+        return updated;
       },
       {
         isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
       }
     );
 
-    return res.status(200).json({message:'아이템 정보를 변경하였습니다.'});
+    return res.status(200).json({
+      message:'아이템 정보를 변경하였습니다.',
+      data: item
+    });
   }catch(error){
-    next();
+    next(error);
   }
 });
+
 
 
 export default router;

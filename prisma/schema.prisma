@@ -113,5 +113,5 @@ model ItemHistories {
   changedAt     DateTime  @default(now())   @map("changedAt")
 
   item  Items   @relation(fields: [item_code], references: [item_code])
-
+  @@map("ItemHistories")
 }
