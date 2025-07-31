@@ -1,6 +1,7 @@
 import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
 import {Prisma} from '@prisma/client';
+import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -166,6 +167,9 @@ router.patch('/items/:item_code', async(req, res, next) =>{
     next(error);
   }
 });
+
+
+
 
 
 

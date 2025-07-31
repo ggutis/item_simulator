@@ -70,12 +70,13 @@ model Inventory {
   invenId     Int       @id @default(autoincrement()) @map("invenId")
   characterId Int       @map("characterId")
   itemId      Int       @map("itemId")
+  count    Int       @default(1) @map("count")
   acquiredAt  DateTime  @default(now()) @map("acquiredAt")
   
   character   Character @relation(fields: [characterId], references: [characterId], onDelete: Cascade)
   items        Items      @relation(fields: [itemId], references: [itemId] )
 
-  @@unique([characterId, itemId]) // 동일 아이템 중복 방지
+  @@unique([characterId, itemId])
 
   @@map("Inventory")
 }
