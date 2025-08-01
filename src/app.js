@@ -26,16 +26,15 @@ app.use(cookieParser());
 
 // 라우터 등록
 app.use('/api', [
-        AccountsRouter, 
-        CharacterRouter, 
-        ItemRouter, 
-        TokensRouter, 
-        PurchaseRouter, 
-        SaleRouter,
-        InventoriesRouter,
-        EquipmentRouter
-      ]
-    );
+  AccountsRouter,
+  CharacterRouter,
+  ItemRouter,
+  TokensRouter,
+  PurchaseRouter,
+  SaleRouter,
+  InventoriesRouter,
+  EquipmentRouter,
+]);
 
 // 에러 핸들링 미들웨어
 app.use(ErrorHandlingMiddleware);

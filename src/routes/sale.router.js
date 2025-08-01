@@ -3,7 +3,6 @@ import { prisma } from '../utils/prisma/index.js';
 import { Prisma } from '@prisma/client';
 import authMiddleware from '../middlewares/auth.middleware.js';
 
-
 const router = express.Router();
 
 router.post('/character/:characterId/sales', authMiddleware, async (req, res, next) => {
@@ -66,28 +65,31 @@ router.post('/character/:characterId/sales', authMiddleware, async (req, res, ne
     const gain = Math.floor(item.item_price * 0.6 * count);
 
     // 트랜잭션 처리
-    await prisma.$transaction(async (tx) => {
-      // 게임 머니 증가
-      await tx.character.update({
-        where: { characterId: +characterId },
-        data: { money: { increment: gain } },
-      });
+    await prisma.$transaction(
+      async (tx) => {
+        // 게임 머니 증가
+        await tx.character.update({
+          where: { characterId: +characterId },
+          data: { money: { increment: gain } },
+        });
 
-      if (inventoryItem.count > count) {
-        // 수량 차감
-        await tx.inventory.update({
-          where: { invenId: inventoryItem.invenId },
-          data: { count: { decrement: count } },
-        });
-      } else {
-        // 수량 전부 판매한 경우 삭제
-        await tx.inventory.delete({
-          where: { invenId: inventoryItem.invenId },
-        });
-      }
-    }, {
-      isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted
-    });
+        if (inventoryItem.count > count) {
+          // 수량 차감
+          await tx.inventory.update({
+            where: { invenId: inventoryItem.invenId },
+            data: { count: { decrement: count } },
+          });
+        } else {
+          // 수량 전부 판매한 경우 삭제
+          await tx.inventory.delete({
+            where: { invenId: inventoryItem.invenId },
+          });
+        }
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+      },
+    );
 
     // 변경된 머니 조회
     const updated = await prisma.character.findUnique({
@@ -100,11 +102,9 @@ router.post('/character/:characterId/sales', authMiddleware, async (req, res, ne
       판매금액: gain,
       남은금액: updated.money,
     });
-
   } catch (error) {
     next(error);
   }
 });
-
 
 export default router;
