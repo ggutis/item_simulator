@@ -34,12 +34,17 @@ model Character {
   characterId    Int        @id @default(autoincrement()) @map("characterId")
   charactername  String     @unique @map("charactername")
   accountId      Int        @map("accountId")
-  characterStat  CharacterStat   
+  hp             Int        @default(100)
+  mp             Int        @default(50)
+  attack         Int        @default(10)
+  defense        Int        @default(5)
+  dexterity      Int        @default(5)
+  speed          Int        @default(5)
   money          Int        @default(10000)
-  createdAt      DateTime            @default(now())    @map("createdAt")
-  updatedAt      DateTime            @updatedAt   @map("updatedAt")
+  createdAt      DateTime   @default(now())    @map("createdAt")
+  updatedAt      DateTime   @updatedAt   @map("updatedAt")
   
-  account        Accounts             @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
+  account        Accounts   @relation(fields: [accountId], references: [accountId], onDelete: Cascade)
   inventoryItems Inventory[]
   equippedItems  CharacterItems[]
   
@@ -116,11 +121,3 @@ model ItemHistories {
   @@map("ItemHistories")
 }
 
-enum CharacterStat{
-  HP
-  MP
-  attack
-  defense
-  dexterity
-  speed
-}

@@ -45,7 +45,12 @@ router.post('/characters', authMiddleware, async (req, res) => {
             select: {
                 characterId: true,
                 charactername: true,
-                characterStat: true,
+                hp: true,
+                mp: true,
+                attack: true,
+                defense: true,
+                dexterity: true,
+                speed: true,
                 money: true,
                 createdAt: true,
             },
@@ -102,11 +107,15 @@ router.get('/character/:characterId', authMiddleware, async (req, res, next) => 
         const character = await prisma.character.findUnique({
             where: { characterId: +characterId },
             select: {
-                charactername: true,
-                health: true,
-                power: true,
-                money: true,
                 accountId: true,
+                charactername: true,
+                hp: true,
+                mp: true,
+                attack: true,
+                defense: true,
+                dexterity: true,
+                speed: true,
+                money: true,
             },
         });
 
@@ -119,8 +128,12 @@ router.get('/character/:characterId', authMiddleware, async (req, res, next) => 
 
         const responseData = {
             charactername: character.charactername,
-            health: character.health,
-            power: character.power,
+            hp: character.hp,
+            mp: character.mp,
+            attack: character.attack,
+            defense: character.defense,
+            dexterity: character.dexterity,
+            speed: character.speed,
             ...(isMyCharacter && { money: character.money }),
         };
 
@@ -218,11 +231,11 @@ router.post('/character/:characterId/equip', authMiddleware, async (req, res, ne
                     speed: {
                         increment: itemEqip.item_stat.speed || 0,
                     },
-                    MP: {
-                        increment: itemEqip.item_stat.MP || 0,
+                    mp: {
+                        increment: itemEqip.item_stat.mp || 0,
                     },
-                    HP: {
-                        increment: itemEqip.item_stat.HP || 0,
+                    hp: {
+                        increment: itemEqip.item_stat.hp || 0,
                     },
                 },
             });
@@ -230,13 +243,13 @@ router.post('/character/:characterId/equip', authMiddleware, async (req, res, ne
             return res.status(200).json({
                 message: '아이템을 장착했습니다.',
                 data: {
-                    characterId: result.characterId,
-                    attack: result.attack,
-                    defense: result.defense,
-                    dexterity: result.dexterity,
-                    speed: result.speed,
-                    mana: result.mana,
-                    hp: result.hp,
+                    characterId: updatedCharacter.characterId,
+                    attack: updatedCharacter.attack,
+                    defense: updatedCharacter.defense,
+                    dexterity: updatedCharacter.dexterity,
+                    speed: updatedCharacter.speed,
+                    mp: updatedCharacter.mp,
+                    hp: updatedCharacter.hp,
                 },
             });
         });
