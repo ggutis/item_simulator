@@ -34,8 +34,7 @@ model Character {
   characterId    Int        @id @default(autoincrement()) @map("characterId")
   charactername  String     @unique @map("charactername")
   accountId      Int        @map("accountId")
-  health         Int        @default(500)
-  power          Int        @default(100)
+  characterStat  CharacterStat   
   money          Int        @default(10000)
   createdAt      DateTime            @default(now())    @map("createdAt")
   updatedAt      DateTime            @updatedAt   @map("updatedAt")
@@ -115,4 +114,13 @@ model ItemHistories {
 
   item  Items   @relation(fields: [item_code], references: [item_code])
   @@map("ItemHistories")
+}
+
+enum CharacterStat{
+  HP
+  MP
+  attack
+  defense
+  dexterity
+  speed
 }
