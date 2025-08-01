@@ -53,6 +53,7 @@ router.post('/items', async (req, res, next) => {
 
 /** 아이템 목록 조회 API **/
 router.get('/items', async (req, res, next) => {
+  console.log('GET /items 요청 들어옴'); // 추가
   try {
     const items = await prisma.items.findMany({
       select: {
