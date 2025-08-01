@@ -10,6 +10,7 @@ import PurchaseRouter from './routes/purchase.router.js';
 import SaleRouter from './routes/sale.router.js';
 import TokensRouter from './routes/tokens.router.js';
 import InventoriesRouter from './routes/inventories.router.js';
+import EquipmentRouter from './routes/equipement.router.js';
 
 dotenv.config();
 
@@ -31,7 +32,8 @@ app.use('/api', [
         TokensRouter, 
         PurchaseRouter, 
         SaleRouter,
-        InventoriesRouter
+        InventoriesRouter,
+        EquipmentRouter
       ]
     );
 

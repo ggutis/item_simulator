@@ -73,14 +73,14 @@ model Items {
 model Inventory {
   invenId     Int       @id @default(autoincrement()) @map("invenId")
   characterId Int       @map("characterId")
-  itemId      Int       @map("itemId")
+  item_code   Int       @map("item_code")
   count    Int       @default(1) @map("count")
   acquiredAt  DateTime  @default(now()) @map("acquiredAt")
   
   character   Character @relation(fields: [characterId], references: [characterId], onDelete: Cascade)
-  items        Items      @relation(fields: [itemId], references: [itemId] )
+  items        Items      @relation(fields: [item_code], references: [item_code] )
 
-  @@unique([characterId, itemId])
+  @@unique([characterId, item_code])
 
   @@map("Inventory")
 }
@@ -88,14 +88,14 @@ model Inventory {
 model CharacterItems {
   characterItemId          Int       @id @default(autoincrement()) @map("characterItemId")
   characterId Int   @map("characterId")
-  itemId      Int   @map("itemId")
+  item_code      Int   @map("item_code")
   equippedAt  DateTime  @default(now()) @map("equippedAt")
  
   character   Character @relation(fields: [characterId], references: [characterId], onDelete: Cascade)
-  items        Items      @relation(fields: [itemId], references: [itemId] )
+  items        Items      @relation(fields: [item_code], references: [item_code] )
   
 
-  @@unique([characterId, itemId]) // 하나의 캐릭터는 같은 아이템을 여러 번 장착 불가
+  @@unique([characterId, item_code]) // 하나의 캐릭터는 같은 아이템을 여러 번 장착 불가
 
   @@map("CharacterItems")
 }

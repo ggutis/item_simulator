@@ -48,7 +48,7 @@ router.post('/character/:characterId/purchase', authMiddleware, async (req, res,
             const existingInventoryItem = await tx.inventory.findFirst({
                 where: {
                     characterId: +characterId,
-                    itemId: item.itemId,
+                    item_code: item.item_code,
                 },
             });
 
@@ -65,7 +65,7 @@ router.post('/character/:characterId/purchase', authMiddleware, async (req, res,
                 await tx.inventory.create({
                     data: {
                         characterId: +characterId,
-                        itemId: item.itemId,
+                        item_code: item.item_code,
                         count: +count,
                     },
                 });
