@@ -6,17 +6,18 @@ import dotenv from 'dotenv';
 import AccountsRouter from './routes/accounts.router.js';
 import CharacterRouter from './routes/character.router.js';
 import ItemRouter from './routes/item.router.js';
-import TokenRouter from './routes/refToken.router.js';
 import PurchaseRouter from './routes/purchase.router.js';
 import SaleRouter from './routes/sale.router.js';
+import TokensRouter from './routes/tokens.router.js';
+import InventoriesRouter from './routes/inventories.router.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = 3018;
 
-const ACCESS_TOKEN_SECRET_KEY = process.env.ACCESS_TOKEN_SECRET_KEY;
-const REFRESH_TOKEN_SECRET_KEY = process.env.REFRESH_TOKEN_SECRET_KEY;
+// const ACCESS_TOKEN_SECRET_KEY = process.env.ACCESS_TOKEN_SECRET_KEY;
+// const REFRESH_TOKEN_SECRET_KEY = process.env.REFRESH_TOKEN_SECRET_KEY;
 
 app.use(LogMiddleware);
 app.use(express.json());
@@ -27,9 +28,10 @@ app.use('/api', [
         AccountsRouter, 
         CharacterRouter, 
         ItemRouter, 
-        TokenRouter, 
+        TokensRouter, 
         PurchaseRouter, 
-        SaleRouter
+        SaleRouter,
+        InventoriesRouter
       ]
     );
 
