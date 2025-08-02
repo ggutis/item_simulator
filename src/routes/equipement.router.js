@@ -113,7 +113,7 @@ router.post('/character/:characterId/equip', authMiddleware, async (req, res, ne
       });
     });
   } catch (error) {
-      next(err);
+      next(error);
   }
 });
 
@@ -236,19 +236,8 @@ router.post('/character/:characterId/detach', authMiddleware, async (req, res, n
       },
     });
   } catch (error) {
-    next(err);
+    next(error);
 
-    if (
-      error.message.includes('캐릭터를') ||
-      error.message.includes('장착중인') ||
-      error.message.includes('아이템')
-    ) {
-      return res.status(404).json({ message: error.message });
-    }
-    if (error.message.includes('이미 장착한')) {
-      return res.status(409).json({ message: error.message });
-    }
-    return res.status(500).json({ message: '서버오류가 발생했습니다.' });
   }
 });
 
