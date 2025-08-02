@@ -7,7 +7,7 @@ export default async function (req, res, next) {
     const { accessToken } = req.cookies;
     if (!accessToken) throw new Error('토큰이 존재하지 않습니다.');
 
-    // 토큰의 인증방식이 Bearer 타입인지 확인합니다.
+   
     const token = accessToken;
 
     // 2. 서버에서 발급한 JWT가 맞는지 검증합니다.

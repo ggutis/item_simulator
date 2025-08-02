@@ -68,8 +68,8 @@ router.get('/items', async (req, res, next) => {
 
     return res.status(200).json({ items });
   } catch (error) {
-    console.error('아이템 목록 조회 에러:', error);
-    return res.status(500).json({ message: '아이템 목록 조회 중 서버 오류가 발생했습니다.' });
+     next(err);
+
   }
 });
 

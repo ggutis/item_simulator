@@ -113,7 +113,8 @@ router.post('/character/:characterId/equip', authMiddleware, async (req, res, ne
       });
     });
   } catch (error) {
-    console.error('아이템 장착 오류:', error);
+      next(err);
+
 
     if (
       error.message.includes('캐릭터를') ||
@@ -248,7 +249,7 @@ router.post('/character/:characterId/detach', authMiddleware, async (req, res, n
       },
     });
   } catch (error) {
-    console.error('아이템 탈착 오류:', error);
+    next(err);
 
     if (
       error.message.includes('캐릭터를') ||

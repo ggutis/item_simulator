@@ -5,7 +5,7 @@ import authMiddleware from '../middlewares/auth.middleware.js';
 const router = express.Router();
 
 /**캐릭터 생성 api */
-router.post('/characters', authMiddleware, async (req, res) => {
+router.post('/characters', authMiddleware, async (req, res, next) => {
   try {
     const { charactername } = req.body;
     const { accountId } = req.user; // authMiddleware에서 넣어준 로그인 계정 ID
@@ -58,13 +58,12 @@ router.post('/characters', authMiddleware, async (req, res) => {
 
     return res.status(201).json({ message: '캐릭터 생성 완료', data: newCharacter });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: '캐릭터 생성 중 오류 발생' });
+    next(err);
   }
 });
 
 /**캐릭터 삭제 api*/
-router.delete('/character/:charactername', authMiddleware, async (req, res) => {
+router.delete('/character/:charactername', authMiddleware, async (req, res , next) => {
   try {
     const { charactername } = req.params;
     const { accountId } = req.user;
@@ -93,8 +92,7 @@ router.delete('/character/:charactername', authMiddleware, async (req, res) => {
 
     return res.status(200).json({ message: '캐릭터가 성공적으로 삭제되었습니다.' });
   } catch (error) {
-    console.error('캐릭터 삭제 에러:', error);
-    return res.status(500).json({ message: '캐릭터 삭제 중 서버 오류가 발생했습니다.' });
+    next(err);
   }
 });
 
@@ -139,8 +137,7 @@ router.get('/character/:characterId', authMiddleware, async (req, res, next) => 
 
     return res.status(200).json(responseData);
   } catch (error) {
-    console.error('캐릭터 상세 조회 오류:', error);
-    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+    next(err);
   }
 });
 
@@ -175,8 +172,8 @@ router.patch('/character/:characterId/addMoney', authMiddleware, async (req, res
 
     return res.status(200).json({ message: '100원이 추가되었습니다.', data: updatedCharacter });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+       next(err);
+
   }
 });
 
